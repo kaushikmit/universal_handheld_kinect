@@ -1,0 +1,7 @@
+#Start the redis-server in one tab on the terminal and keep it running for the entire process
+redis-server
+#Change to a separate tab on the terminal
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+python app.py
