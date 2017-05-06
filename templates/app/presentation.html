@@ -27,7 +27,7 @@
            <script type="text/javascript" src="/static/common/js/socket.io.min.js"></script>
         <script>
             Reveal.initialize();
-           Reveal.right();
+           //Reveal.right();
         //  Reveal.right();
 
            var accelPrevX;
@@ -50,9 +50,9 @@
                 var shakeCount=0;
                 var goVerifyValue =false;
 
-                var myVar = setInterval(myTimer, 1000);
+                //var myVar = setInterval(myTimer, 1000);
 
-                function myTimer() {
+               /* function myTimer() {
                    // debugger;
                     if(goVerifyValue == true && shakeCount == 1)
                     {
@@ -75,8 +75,10 @@
                         Reveal.left();
                     }
 
-                }
+                }*/
+                var noOFInnerCalls=0;
 
+var obj_val;
                 socket.on('model::ACCEL_STREAM', function(message){
                 //  var current = e.accelerationIncludingGravity;
                         var currentTime;
@@ -84,8 +86,8 @@
                         var deltaX = 0;
                         var deltaY = 0;
                         var deltaZ = 0;
-                        var threshold = 8; //default velocity threshold for shake to register
-                        var timeout = 75; 
+                        var threshold = 10; //default velocity threshold for shake to register
+                        var timeout = 60; 
                  
                         var _obj = message.split(",");
 
@@ -120,8 +122,51 @@
                                 goVerifyValue = true;
 
                                 lastTime = new Date();
-                               
-                            }
+      
+
+                                if(obj_val != undefined) {console.log("called clear timeout" + obj_val); clearTimeout(obj_val);}
+                                obj_val=setTimeout(function() {
+                                    console.log("called");
+                                    noOFInnerCalls=noOFInnerCalls+1;    
+                                         console.log("Before ShakeCount Val:"+shakeCount);
+                                    //debugger;
+                                    if(goVerifyValue == true && shakeCount == 1)
+                                    {
+                                        shakeCount=0;
+                                        goVerifyValue=false;
+                                        console.log("Single Shake Baby");
+                                        Reveal.right();
+                                        console.log("ShakeCount Val:"+shakeCount);
+                                        return;
+
+                                    }
+                                    else if(goVerifyValue == true && shakeCount == 2)
+                                    {
+
+                                     shakeCount=0;
+                                     goVerifyValue=false;
+                                        console.log("Double Shake Baby");
+                                        Reveal.left(); 
+                                        return;  
+                                    }
+                                    else if(goVerifyValue ==true && shakeCount>2)
+                                    {
+                                        shakeCount=0;
+                                        goVerifyValue = false;
+                                        console.log("More than 2 shakes");
+                                        Reveal.left();
+                                        return;
+                                    }
+
+                                }, 300);
+console.log(obj_val);
+                              
+  
+
+
+                        
+
+                        }
 
                             /*if(shakeCount === 2)
                             {
@@ -136,6 +181,8 @@
                         accelPrevX = _obj[0];
                         accelPrevY = _obj[1];
                         accelPrevZ = _obj[2];
+                        return;    
+                        //console.log("Count of Inner Calls :"+noOFInnerCalls);
                                           
                 });
 
