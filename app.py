@@ -31,7 +31,6 @@ def index():
         thread.start()
     return render_template('index.html')
 
-
 @app.route('/receiver/<path:path>')
 def receiver(path):
     return render_template('receiver/'+"receiver.html")
@@ -68,6 +67,16 @@ def heart_commands_receiver(message):
     r.publish('model::COMMANDS', message)
     # Broadcast data to all connected clients
     emit('model::COMMANDS', message, broadcast=True)
+
+@app.route('/app/panaromic')
+def panaromic_view():
+    return render_template("panaromicimage/panaromicview.html")
+
+@app.route('/uploadfile', methods=['POST'])
+def upload_panaromic_file():
+    file = request.files['file']
+    file.save("my.jpg")
+    return "my.jpg"
 
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0")
