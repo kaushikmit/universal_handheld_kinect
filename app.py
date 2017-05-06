@@ -56,6 +56,12 @@ def renderer():
 def heartrenderer():
     return render_template('app/'+"heartrenderer.html")
 
+@app.route('/app/presentation')
+def app_presenter():
+    return render_template('app/'+"presentation.html")
+
+
+
 """
     Socket.io stream receiver
 """
