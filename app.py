@@ -40,6 +40,13 @@ def receiver(path):
 def app_renderer(path):
     return render_template('app/'+"heart.html")
 
+
+@app.route('/app/presentation')
+def app_presenter():
+    return render_template('app/'+"presentation.html")
+
+
+
 """
     Socket.io stream receiver
 """

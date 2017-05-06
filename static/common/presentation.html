@@ -1,0 +1,142 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section>Slide 1
+<img src="go.gif" alt="NAS logo" height="110px" width="200px">
+                </section>
+                <section>Slide 2</section>
+                <section>Slide 3</section>
+                <section>Slide 4</section>
+                <section>Slide 5</section>
+                <section>Slide 6</section>
+                <section>Slide 7</section>
+                <section>Slide 8</section>
+            </div>
+        </div>
+        <script>
+            Reveal.initialize();
+//            Reveal.right();
+        //  Reveal.right();
+
+           var accelPrevX;
+           var accelPrevY;
+           var accelPrevZ;
+
+            $(document).ready(function(){
+                namespace = '/model'; // change to an empty string to use the global namespace
+
+                // the socket.io documentation recommends sending an explicit package upon connection
+                // this is specially important when using the global namespace
+                var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+                    socket.on('connect', function() {
+                    //socket.emit('my event', {data: 'I\'m connected!'});
+
+                });
+
+
+                var lastTime = new Date();
+                var shakeCount=0;
+                var goVerifyValue =false;
+
+                var myVar = setInterval(myTimer, 2000);
+
+                function myTimer() {
+                   // debugger;
+                    if(goVerifyValue == true && shakeCount == 1)
+                    {
+                        shakeCount=0;
+                        console.log("Single Shake Baby");
+                        Reveal.right();
+
+                    }
+                    else if(goVerifyValue == true && shakeCount == 2)
+                    {
+
+                     shakeCount=0;
+                        console.log("Double Shake Baby");
+                        Reveal.left();   
+                    }
+                    else if(goVerifyValue ==true && shakeCount>2)
+                    {
+                        shakeCount=0;
+                        console.log("More than 2 shakes");
+                        Reveal.left();
+                    }
+
+                }
+
+                socket.on('model::ACCEL_STREAM', function(message){
+                //  var current = e.accelerationIncludingGravity;
+                        var currentTime;
+                        var timeDifference;
+                        var deltaX = 0;
+                        var deltaY = 0;
+                        var deltaZ = 0;
+                        var threshold = 10; //default velocity threshold for shake to register
+                        var timeout = 75; 
+                 
+                        var _obj = message.split(",");
+
+                                    _obj[0] = (parseInt(_obj[0])); // 0-360
+                                    _obj[1] = (parseInt(_obj[1])); // -180 - 180
+                                    _obj[2] = (parseInt(_obj[2])); // -90 - 90
+
+
+
+                        if ((accelPrevX === null) && (accelPrevY === null) && (accelPrevZ === null)) {
+                            accelPrevX = _obj[0];
+                            accelPrevY = _obj[1];
+                            accelPrevZ = _obj[2];
+                            return;
+                        }
+
+                        deltaX = Math.abs(accelPrevX - _obj[0]);
+                        deltaY = Math.abs(accelPrevY - _obj[1]);
+                        deltaZ = Math.abs(accelPrevZ - _obj[2]);
+
+                        if (((deltaX > threshold) && (deltaY > threshold)) || ((deltaX > threshold) && (deltaZ > threshold)) || ((deltaY > threshold) && (deltaZ > threshold))) {
+                            //calculate time in milliseconds since last shake registered
+
+                            currentTime = new Date();
+                            timeDifference = currentTime.getTime() - lastTime.getTime();
+                       //console.log("Movement caused the shake");
+
+                            if (timeDifference > timeout) {
+                               
+                              // console.log("Shake Occurred");
+                               shakeCount=shakeCount+1;
+                                goVerifyValue = true;
+
+                                lastTime = new Date();
+                               
+                            }
+
+                            /*if(shakeCount === 2)
+                            {
+                                //console.log("DoubleShake");
+                                shakeCount=0;
+                                goVerifyValue = true;
+                            } */
+
+
+                        }
+
+                        accelPrevX = _obj[0];
+                        accelPrevY = _obj[1];
+                        accelPrevZ = _obj[2];
+                                          
+                });
+
+
+            });
+        </script>
+    </body>
+</html>
+
+
+        
+
+  
