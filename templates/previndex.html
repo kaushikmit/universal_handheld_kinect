@@ -1,0 +1,85 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+	integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+	crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<title>Project Name</title>
+</head>
+
+<script>
+function changeText()
+{
+	var myInnerHtml = document.getElementById("btn").innerHTML;
+	if(myInnerHtml == "Connect") {
+	document.getElementById("btn").innerHTML = "Disconnect";
+
+	}
+	else {
+		document.getElementById("btn").innerHTML = "Connect";
+
+	}
+}
+</script>
+
+<body >
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand active" href="#home"><img src="Freshdesk-Save-the-Hacker-featured.png" width="35" height="30" padding-top="10px"></a>
+				</div>
+				<ul class="nav navbar-nav">
+				<li><a data-toggle="tab" href="#home">HOME</a></li>
+				<li><a data-toggle="tab" href="#air3d">Air 3D</a></li>
+				<li><a data-toggle="tab" href="#ppt">PPT</a></li>
+				<li>
+					<button class="btn btn-danger navbar-btn pull-right"
+						onclick="changeText()" id="btn">Connect</button>
+				</li>
+			</ul>
+		</div>
+	</nav>
+
+	<div class="tab-content">
+		<div id="home" class="tab-pane fade in active ">
+
+			 <img src="resource/sample6.jpg" >
+		</div>
+		<div id="air3d" class="tab-pane fade">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-2"></div>
+					<div class="col-sm-8"></div>
+					<div class="col-sm-2"></div>
+				</div>
+			</div>
+		</div>
+		<div id="ppt" class="tab-pane fade"></div>
+
+
+	</div>
+
+
+
+</body>
+</html>

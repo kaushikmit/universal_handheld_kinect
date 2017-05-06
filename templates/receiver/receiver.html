@@ -47,6 +47,19 @@
                 }
             }
 
+            //Shake Event Listener
+
+            var shakeEvent = new Shake({threshold: 5});
+            shakeEvent.start();
+            window.addEventListener('shake', function(){
+                    socket.emit('model::COMMANDS', "SHAKE");
+            }, false);
+
+            //stop listening
+            function stopShake(){
+                shakeEvent.stop();
+            }
+
             $("#clearModel").click(function(){
                     socket.emit('model::COMMANDS', "CLEAR_MODEL");
             });

@@ -31,6 +31,14 @@ def index():
         thread.start()
     return render_template('index.html')
 
+@app.route('/previndex')
+def previndex():
+    global thread
+    if thread is None:
+        thread = Thread(target=background_thread)
+        thread.start()
+    return render_template('previndex.html')
+
 
 @app.route('/receiver/<path:path>')
 def receiver(path):
@@ -39,6 +47,14 @@ def receiver(path):
 @app.route('/app/<path:path>')
 def app_renderer(path):
     return render_template('app/'+"heart.html")
+
+@app.route('/app/renderer')
+def renderer():
+    return render_template('app/'+"renderer.html")
+
+@app.route('/app/heartrenderer')
+def heartrenderer():
+    return render_template('app/'+"heartrenderer.html")
 
 """
     Socket.io stream receiver

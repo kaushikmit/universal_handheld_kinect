@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+         <!-- My Styles -->
+         <link rel="stylesheet" type="text/css" href="/static/heart/css/style.css" />
+        <script type="text/javascript" src="/static/common/js/socket.io.min.js"></script>
+
+
+         <!-- Threejs Program -->
+         <script type='text/javascript' src="/static/heart/js/three.js" ></script>
+        <!-- // <script type='text/javascript' src="/static/heart/js/three_new.js" ></script> -->
+
+
+        <!-- For rendering -->
+        <script src="/static/heart/js/ShaderSkin.js"></script>
+
+        <script src="/static/heart/js/shaders/CopyShader.js"></script>
+
+        <script src="/static/heart/js/postprocessing/EffectComposer.js"></script>
+        <script src="/static/heart/js/postprocessing/RenderPass.js"></script>
+        <script src="/static/heart/js/postprocessing/ShaderPass.js"></script>
+        <script src="/static/heart/js/postprocessing/MaskPass.js"></script>
+
+        <!-- for DOM events -->
+        <script type='text/javascript' src="/static/heart/js/threex.domevent.js"></script>
+        <script type='text/javascript' src="/static/heart/js/threex.domevent.object3d.js"></script>
+
+        <!-- Other Controls and Events -->
+        <script type='text/javascript' src="/static/heart/js/controls/TrackballControls.js"></script>
+        <script type='text/javascript' src="/static/heart/js/AnaglyphEffect.js"></script>
+        <script type='text/javascript' src="/static/heart/js/Detector.js"></script>
+        <script type='text/javascript' src="/static/heart/js/THREEx.FullScreen.js"></script>
+        <script type='text/javascript' src="/static/heart/js/THREEx.WindowResize.js"></script>
+
+         <script type='text/javascript' src="/static/heart/js/dat.gui.js"></script>
+         <script src="/static/heart/js/jquery-1.9.1.min.js"></script>
+
+        <script>
+
+            var mouseX;
+            var mouseY;
+            $(document).mousemove( function(e) {
+               mouseX = e.pageX;
+               mouseY = e.pageY;
+               $('#DivToShow').css({'top':mouseY-30,'left':mouseX});
+               //console.log(mouseX , mouseY);
+            });
+
+
+
+            var renderer = null,
+            scene = null,
+            camera = null,
+            zmesh = null,
+            animating = false;
+
+            var controls, projector;
+
+            var meshes = new Object();
+
+            var mouse = new THREE.Vector2(), offset = new THREE.Vector3(), INTERSECTED, SELECTED;
+
+            var modelNames =[ "heart","Atrium","RightCoronaryArtery", "LeftCoronaryArtery", "PosteriorInterventricularArtery" , "RightMarginalArtery", "CircumflexArtery", "Veins","Ventricles","Nerves","AorticValve","BicuspidValve","PulmonaryValve","TricuspidValve"];
+
+            var modelOrder =[ "heart","Atrium","RightCoronaryArtery", "LeftCoronaryArtery", "PosteriorInterventricularArtery" , "RightMarginalArtery", "CircumflexArtery", "Veins","Ventricles","Nerves","AorticValve","BicuspidValve","PulmonaryValve","TricuspidValve"];
+
+
+            //Advance Shader Variables
+            var mapColor, mapHeight, mapSpecular;
+            var firstPass = true;
+            var composer, composerBeckmann;
+
+            //SET UP
+            function onLoad() {
+                // Grab our container div
+                var container = document.getElementById("heartContain");
+
+                // Create the Three.js renderer, add it to our div, append to the DOM
+                renderer = new THREE.WebGLRenderer( { antialias: true } );
+                renderer.setSize(container.offsetWidth, container.offsetHeight);
+                container.appendChild( renderer.domElement );
+
+                // Create a new Three.js scene
+                scene = new THREE.Scene();
+
+                // Put in a camera
+                camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 2, 4000 );
+                THREE.Object3D._threexDomEvent.camera(camera);
+                camera.position.set( 0, 0, -350 );
+
+                var domEvents = new Object();
+
+                //Create mouse controls
+                controls = new THREE.TrackballControls ( camera, renderer.domElement );
+                controls.rotateSpeed = 1.5;
+                controls.zoomSpeed = 2.0;
+                controls.panSpeed = 1.0;
+                controls.noZoom = false;
+                controls.noPan = false;
+                controls.staticMoving = true;
+                controls.dynamicDampingFactor = 0.3;
+
+                // Add some light for ambiance
+                var light = new THREE.AmbientLight(0xA8A8A8);
+                light.position.set(0, 0, 1.0);
+                scene.add( light );
+
+                var light2 = new THREE.DirectionalLight(0xffffff, 1.0);
+                light2.position.set(0, 50, 1.5);
+                scene.add( light2 );
+
+
+                // Load Geometry -- webgl_loader_json_objconverter.html
+                var loader = new THREE.JSONLoader();
+
+
+                //return a funtion that builds the geometry and assigns to array
+                //http://stackoverflow.com/questions/10920372/associate-loaded-json-files-with-a-name-for-later-access
+                function makeHandler(meshName){
+                    return function(geometry){
+                        if (meshName =="Nerves"){
+                            //var nerveColor = new THREE.FaceColors(0xDDE079);
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( { ambient: 0xFFFF33, transparent: true,  side: 2, blending: 1} ) );
+                        }else if(meshName == "heart"){
+                            var textMap = "/static/heart/obj/heart_text_objs/"+meshName+".jpg";
+                            var specMap ="/static/heart/obj/heart_text_objs/heartSPEC.jpg";
+                            var texture = new THREE.ImageUtils.loadTexture(textMap);
+                            var specTexture = new THREE.ImageUtils.loadTexture(specMap);
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( { map:texture, opacity: 1.0, transparent: true, side: 2}) );
+
+                        }else if(meshName == "RightCoronaryArtery" || meshName == "LeftCoronaryArtery" || meshName == "PosteriorInterventricularArtery" || meshName == "RightMarginalArtery" || meshName == "CircumflexArtery"){
+                            //var arteryColor = new THREE.Color(0xDDE079);
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( { color: 0x780000 , ambient:0x780000, opacity: 1.0, transparent: true, side: 2, blending: 1} ) );
+
+                        }else{
+                            var textMap = "/static/heart/obj/heart_text_objs/"+meshName+".jpg";
+                            var texture = new THREE.ImageUtils.loadTexture(textMap);
+                            mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial ( {map:texture, opacity:1.0, transparent: true, side: 2, blending: 1}) );
+                        }
+
+                        mesh.position.set(0, 0, 0);
+                        mesh.name = meshName;
+                        mesh.doubleSided = true;
+                        scene.add(mesh);
+                        console.log(meshName);
+                        meshes[meshName] = mesh;
+
+
+                    }
+                }
+
+
+                //load all heart model meshes
+                for( var i = 0; i < modelNames.length; i++){
+                    var path = "/static/heart/obj/heart_text_objs/"+modelNames[i]+".js";
+                    meshName = modelNames[i];
+                    loader.load( path, makeHandler(meshName));
+                }
+
+
+            window.addEventListener( 'resize', onWindowResize, false );
+            camera.lookAt( 0, -40, 0);
+
+
+            // Add a mouse up handler to toggle the animation
+            addMouseHandler();
+
+            run();
+
+
+
+            }
+
+            var maxDistance = 350;
+            var minBound = 0.2;
+            var maxBound = 1;
+
+            function setZoom(zoomLevel){
+                zoomLevel = 1 - zoomLevel/100;
+
+                // zoomLevel : [0,100]
+                if(zoomLevel < minBound){
+                    zoomLevel = minBound;
+                }
+                if(zoomLevel > maxBound){
+                    zoomLevel = maxBound;
+                }
+
+                console.log(-1 * maxDistance * zoomLevel);
+                camera.position.set( 0, 0, -maxDistance * zoomLevel );
+            }
+
+            function onWindowResize() {
+
+                windowHalfX = window.innerWidth / 2;
+                windowHalfY = window.innerHeight / 2;
+
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+            }
+
+        //DRAW
+            function render(){
+                renderer.render( scene, camera );
+                controls.update();
+
+            }
+            function run()
+            {
+
+                // Spin the cube for next frame
+                if (animating)
+                {
+                    // //console.log(meshes);
+                    // for(var i = 0; i < meshes.length; i++){
+                    //  meshes[i].rotation.y -= 0.01;
+                    // }
+                }
+                // Ask for another frame
+                requestAnimationFrame(run); // will not render if browser is inactive
+
+                // Render the scene
+                render();
+            }
+
+            function addMouseHandler()
+            {
+                var dom = renderer.domElement;
+                dom.addEventListener( 'mouseup', onMouseUp, false);
+            }
+
+            function onMouseUp    (event)
+            {
+                event.preventDefault();
+                animating = !animating;
+            }
+
+            function printMeshes(){
+                console.log("in print Mesh");
+                //console.log(meshes);
+                for(var i = 0; i < modelNames.length; i++){
+                        console.log(meshes[modelNames[i]]);
+                    }
+            }
+
+            function toggleVisibility(){
+                // //try to access individual mesh
+                // if (meshes[modelNames[i]].visible == true){
+                //      meshes[modelNames[0]].visible = false;
+                //  }else{
+                //      meshes[modelNames[0]].visible = true;
+                //  }
+
+
+                for(var i = 0; i < modelNames.length; i++){
+                    if (meshes[modelNames[i]].visible == true){
+                        meshes[modelNames[i]].visible = false;
+                    }else{
+                        meshes[modelNames[i]].visible = true;
+                    }
+                }
+            }
+
+            $(document).ready(function(){
+                namespace = '/model'; // change to an empty string to use the global namespace
+
+
+                var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+                socket.on('connect', function() {
+
+                });
+
+                socket.on('model::GYRO_STREAM', function(message){
+
+                    var _obj = message.split(",");
+
+
+                    _obj[0] = (parseFloat(_obj[0])/180)*Math.PI; // 0-360
+                    _obj[1] = (parseFloat(_obj[1])/180)*Math.PI; // -180 - 180
+                    _obj[2] = (parseFloat(_obj[2])/180)*Math.PI; // -90 - 90
+
+                    var quaternion = new THREE.Quaternion();
+                    quaternion.setFromEuler(new THREE.Vector3(_obj[0], _obj[1], _obj[2]), 'XYZ');
+
+                    Object.keys(meshes).forEach(function(key) {
+
+                        meshes[key].useQuaternion = true;
+                        meshes[key].quaternion = quaternion;
+                    });
+
+                });
+
+                //Shake Handling
+                window.shake_count = 0;
+                window.shake_count_increment = 1;
+
+                $("#meshName").html(modelOrder[window.shake_count]);
+
+                socket.on('model::COMMANDS', function(message){
+
+                    console.log('Heart Shake');
+                    if(message=="SHAKE"){
+                        console.log('Shake');
+                        processShake();
+
+                    }else if(message == "CLEAR_MODEL"){
+                        clearModel();
+                    }else if(message == "RESET_MODEL"){
+                        resetModel();
+                    }else{
+                        //zoomLevel
+                        //console.log(message);
+                        //window.spm = message;
+                        setZoom(parseFloat(message.split(",")[1]));
+                    }
+
+                });
+            });
+
+            function resetVisibility(){
+                for(var i=0;i<modelOrder.length; i++){
+                    meshes[modelOrder[i]].visible = true;
+                }
+                window.shake_count = 0;
+                window.shake_count_increment = 1;
+            }
+
+            function getBoundedShakeCount(count){
+                if(count<=0){
+                    return 0;
+                }
+                else if(count>=modelOrder.length-1){
+                    window.shake_count = modelOrder.length - 1;
+                    return modelOrder.length-1;
+                }else{
+                    return count;
+                }
+            }
+
+            function topMod(count){
+                if(count<modelOrder.length){
+                    return count;
+                }else{
+                    return modelOrder.length - (count - modelOrder.length);
+                }
+            }
+
+            function clearModel(){
+                for(var i=0; i<modelOrder.length; i++){
+                    meshes[modelOrder[i]].visible = false;
+                }
+                window.shake_count = modelOrder.length + 1;
+
+                $("#meshName").html("heart");
+            }
+
+            function resetModel(){
+                for(var i=0; i<modelOrder.length; i++){
+                    meshes[modelOrder[i]].visible = true;
+                }
+                window.shake_count = 0;
+                window.first_shake = false;
+                $("#meshName").html("heart");
+
+            }
+
+
+            window.first_shake = false;
+            function processShake(){
+
+                        console.log("Shake Count PRE "+window.shake_count);
+                        console.log("Shake Count topMod "+topMod(window.shake_count));
+
+                        if(meshes[modelOrder[topMod(window.shake_count)]].visible){
+                            meshes[modelOrder[topMod(window.shake_count)]].visible = false
+                        }else{
+                            meshes[modelOrder[topMod(window.shake_count)]].visible = true
+                            $("#meshName").html(modelOrder[topMod(window.shake_count)]);
+                        }
+
+
+                        if(window.shake_count == 0 && window.first_shake){
+                            window.first_shake = false;
+                        }else{
+                            window.shake_count += window.shake_count_increment
+                            window.shake_count = window.shake_count % (2*modelOrder.length);
+
+                            window.first_shake = true;
+                        }
+
+
+                        if(window.shake_count == modelOrder.length){
+                            window.shake_count += window.shake_count_increment
+                            window.shake_count = window.shake_count % (2*modelOrder.length);
+                        }
+
+            }
+
+            function normalizeEulerAngleToCartesian(_obj){
+                //Initialise a point facing to X - Axis
+                window._X = new Vector({ x: 1,  y: 0,  z: 0,  w: 0 })
+                window._Y = new Vector({ x: 0,  y: 1,  z: 0,  w: 0 })
+                window._Z = new Vector({ x: 0,  y: 0,  z: 1,  w: 0 })
+
+                //Rotate Along Z Axis
+                window._X.rotate(window._Z, _obj[0])
+                window._Y.rotate(window._Z, _obj[0])
+
+                window._Y.rotate(window._X, _obj[1])
+                window._Z.rotate(window._X, _obj[1])
+
+                window._X.rotate(window._Y, _obj[2])
+                window._Z.rotate(window._Y, _obj[2])
+
+
+
+                window._X.x -= 1;
+
+                window._x = window._X.x;
+                window._y = window._X.y;
+                window._z = window._X.z;
+
+
+                return new THREE.Vector3(window._x, window._y, window._z)
+                // return new THREE.Vector3(window._Y.x, window._Y.y, window._Y.z);
+            }
+
+
+
+            </script>
+
+
+    </head>
+    <body onLoad="onLoad();" style="">
+
+    <script>
+
+
+    </script>
+
+        <div id="meshName" style="color:red"></div>
+
+        <div id ="heart-gui" style="position:fixed; right:0; top:0;"></div>
+        <div id="heartContain"></div>
+        <div id="prompt" style="width:95%; height:6%; bottom:0; position:absolute;">
+    <!--    <input id="visiblitiy" type="button" value "Visible" onclick="toggleVisibility();"> -->
+        </input>
+
+
+        </div>
+        <div id="DivToShow"> </div>
+        <script type='text/javascript' src="/static/heart/js/heart.labels.gui.js"></script>
+        <div class="sourcemodel" style="font-size:8px">3D Model Source : http://heart3d.encephalostudios.com/ThreeJStest/index.html </div>
+    </body>
+</html>
