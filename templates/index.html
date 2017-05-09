@@ -1,34 +1,144 @@
-<!DOCTYPE HTML>
 <html>
 <head>
-   <title>Air3D</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
-    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="/static/common/css/bootstrap.min.css">
 
+<!-- Optional theme -->
+<link rel="stylesheet"
+	href="/static/common/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script
+	src="/static/common/js/jquery-3.2.1.min.js"></script>
+
+<script
+  src="/static/common/js/tether.min.js"></script>
+
+<script
+	src="/static/common/js/bootstrap.js"></script>
+
+<script src="/static/common/js/three.js"></script>
+
+<title>Air3D</title>
+<style>
+#divstyle{
+    background-color: black;
+}
+</style>
 </head>
-<body>
 
-    <div data-role="page" id="pageone">
-      <div data-role="header">
-        <h1>A Proto !</h1>
+<body >
+
+  <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#">UHK</a>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/objrenderer">OBJ Renderer</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/3drenderer">3D Renderer</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/slideshow">Slideshow Presenter</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/airmouse">Air Mouse</a>
+          </li>
+
+        </ul>
       </div>
+    </nav>
+<center>
 
-      <div data-role="main" class="ui-content">
-        <a class="ui-btn" target="_blank" href="/app/heartrenderer">Renderer</a>
-        <a class="ui-btn" href="/receiver/heart">Receiver</a>
-        <a class="ui-btn" href="/app/presentation">Presentation</a>
+</center>
+ <div class="jumbotron">
+        <div class="col-sm-8 mx-auto">
+        <div class="row">
+        <div class="col">
+
+             <center>
+  <div id="animatedbox">
+  </div>
+  </center>
+  <div id="divstyle">
+  <script>
+      var camera, scene, renderer;
+      var mesh;
+      init();
+      animate();
+      function init() {
+        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+        camera.position.z = 400;
+        scene = new THREE.Scene();
+        var texture = new THREE.TextureLoader().load( '/static/common/assets/mobile.png' );
+        var geometry = new THREE.BoxBufferGeometry( 300, 300, 300 );
+        var material = new THREE.MeshBasicMaterial( { map: texture } );
+        mesh = new THREE.Mesh( geometry, material );
+        scene.add( mesh );
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( 300, 300 );
+        //document.body.appendChild( renderer.domElement);
+        document.getElementById("animatedbox").appendChild(renderer.domElement);
+        //
+        window.addEventListener( 'resize', onWindowResize, false );
+      }
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize( 300, 300 );
+      }
+      function animate() {
+        requestAnimationFrame( animate );
+        mesh.rotation.x += 0.005;
+        mesh.rotation.y += 0.01;
+        renderer.render( scene, camera );
+      }
+    </script>
+</div>
 
 
-        <!--Receiver IP : 192.168.0.9 -->
 
+
+
+
+       </div>
+        <div class="col">
+          <h1>Universal Handheld Kinect</h1>
+         <p>
+            Voila! Here we come the "Geeks 4 Ever" presenting you a web application
+            called "Universal Handheld Kinect" that has never been implemented before.
+            We have developed a framework to control the motion of objects in the browser without
+            installing additional software by using only gestures.Are you curious to know about how the
+            sections of your organs look? You dont have to be a doctor.
+        </p>
+        <p>
+            Just a single jerk can help you learn
+            more. Have you lost the receiver of your wireless mouse? No worries. Swipe your mobile.
+            Finding it difficult to navigate through the boring presentations? We present you an easy way
+            to sweep through the slides. There are many interesting applications worth a mention, but no, it's a suspense.
+            Try the app and know more.
+         </p>
+          <p>
+            <a class="btn btn-primary" href="/" role="button">Get Started &raquo;</a>
+          </p>
+        </div>
+        </div>
+        </div>
       </div>
-
-      <div data-role="footer">
-        <h1>Team Air3D</h1>
-      </div>
-
     </div>
+
+	</div>
+
 </body>
 </html>

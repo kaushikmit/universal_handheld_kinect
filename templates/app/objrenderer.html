@@ -1,0 +1,345 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+  href="/static/common/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet"
+  href="/static/common/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script
+  src="/static/common/js/jquery-3.2.1.min.js"></script>
+
+<script
+  src="/static/common/js/tether.min.js"></script>
+
+<script
+  src="/static/common/js/bootstrap.js"></script>
+
+<script src="/static/common/js/three.js"></script>
+
+<!--Used for rendering generic 3d model-->
+    <script src="/static/common/js/three.js"></script>
+    <script src="/static/common/js/Detector.js"></script>
+    <script src="/static/common/js/OrbitControls.js"></script>
+    <script src="/static/common/js/OBJLoader.js"></script>
+    <script src="/static/common/js/MTLLoader.js"></script>
+
+
+    <script type="text/javascript" src="/static/common/js/socket.io.min.js"></script>
+
+<title>Air3D</title>
+
+ <style>
+        body {
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background: hsl(0, 0%, 10%);
+        }
+
+        p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .left,
+        .right {
+            position: absolute;
+            color: #fff;
+            font-family: Geneva, sans-serif;
+        }
+
+        .left {
+            bottom: 1em;
+            left: 1em;
+            text-align: left;
+        }
+
+        .right {
+            top: 0;
+            right: 0;
+            text-align: right;
+        }
+
+        a {
+            color: #f58231;
+        }
+    </style>
+
+</head>
+
+<body >
+
+  <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#">UHK</a>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/app/objrenderer">OBJ Renderer</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/3drenderer">3D Renderer</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/slideshow">Slideshow Presenter</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/airmouse">Air Mouse</a>
+          </li>
+
+        </ul>
+      </div>
+    </nav>
+<center>
+
+</center>
+ <div class="jumbotron">
+        <div class="col-sm-8 mx-auto">
+          <h1>Air3D OBJ File Renderer</h1>
+
+
+    <script>
+
+        if (!Detector.webgl) {
+            Detector.addGetWebGLMessage();
+        }
+
+        var container, object3D;
+
+        var camera, controls, scene, renderer;
+        var lighting, ambient, keyLight, fillLight, backLight;
+
+        var windowHalfX = window.innerWidth / 2;
+        var windowHalfY = window.innerHeight / 2;
+
+        init();
+        animate();
+
+        function init() {
+
+            container = document.createElement('div');
+            document.body.appendChild(container);
+
+            /* Camera */
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.z = 3;
+
+            /* Scene */
+
+            scene = new THREE.Scene();
+            lighting = false;
+
+            ambient = new THREE.AmbientLight(0xffffff, 1.0);
+            scene.add(ambient);
+
+            keyLight = new THREE.DirectionalLight(new THREE.Color('hsl(30, 100%, 75%)'), 1.0);
+            keyLight.position.set(-100, 0, 100);
+
+            fillLight = new THREE.DirectionalLight(new THREE.Color('hsl(240, 100%, 75%)'), 0.75);
+            fillLight.position.set(100, 0, 100);
+
+            backLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            backLight.position.set(100, 0, -100).normalize();
+
+            /* Model */
+
+            var mtlLoader = new THREE.MTLLoader();
+            mtlLoader.setBaseUrl('/static/common/assets/');
+            mtlLoader.setPath('/static/common/assets/');
+            mtlLoader.load('female-croupier-2013-03-26.mtl', function (materials) {
+
+                materials.preload();
+
+                materials.materials.default.map.magFilter = THREE.NearestFilter;
+                materials.materials.default.map.minFilter = THREE.LinearFilter;
+
+                var objLoader = new THREE.OBJLoader();
+                objLoader.setMaterials(materials);
+                objLoader.setPath('/static/common/assets/');
+                objLoader.load('female-croupier-2013-03-26.obj', function (object) {
+
+                    object3D = object;
+                    scene.add(object);
+                    console.log('Children:'+object3D.layers);
+
+                    var json = object3D.toJSON(json);
+                    console.log('\nJSON Object:'+json);
+
+                    for (var i = 0; i < json.length; i++){
+                       var obj = json[i];
+                        console.log('Inside Object');
+                        for (var key in obj){
+                             var attrName = key;
+                             var attrValue = json[key];
+                             console.log('\nKey:'+attrName);
+                             console.log('\nValue:'+attrValue);
+                    }
+}
+
+                });
+
+            });
+            /* Renderer */
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(new THREE.Color("hsl(0, 0%, 10%)"));
+
+            container.appendChild(renderer.domElement);
+
+            /* Controls */
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.25;
+            controls.enableZoom = false;
+
+            /* Events */
+
+            window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener('keydown', onKeyboardEvent, false);
+
+        }
+
+        function onWindowResize() {
+
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        }
+
+        function onKeyboardEvent(e) {
+
+            console.log("On Keyboard Event");
+            if (e.code === 'KeyL') {
+
+                lighting = !lighting;
+
+                if (lighting) {
+
+                    ambient.intensity = 0.25;
+                    scene.add(keyLight);
+                    scene.add(fillLight);
+                    scene.add(backLight);
+
+                } else {
+
+                    ambient.intensity = 1.0;
+                    scene.remove(keyLight);
+                    scene.remove(fillLight);
+                    scene.remove(backLight);
+
+                }
+
+            }
+
+        }
+
+        function animate() {
+
+            requestAnimationFrame(animate);
+
+            controls.update();
+
+            render();
+
+        }
+
+        function render() {
+
+            renderer.render(scene, camera);
+
+        }
+
+        /*------3d Controls ----- */
+        function setZoom(zoomLevel){
+
+                console.log("Zoom Activated");
+                camera.position.set(0,0,zoomLevel);
+        }
+
+
+        $(document).ready(function()
+        {
+                namespace = '/model'; // change to an empty string to use the global namespace
+
+                // the socket.io documentation recommends sending an explicit package upon connection
+                // this is specially important when using the global namespace
+                var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+                socket.on('connect', function() {
+                    socket.emit('my event', {data: 'I\'m connected!'});
+                    console.log('Socket Connected');
+                });
+
+                //Generic Commands
+                socket.on('model::COMMANDS', function(message)
+                {
+
+                    console.log('Command Issued');
+                    setZoom(parseFloat(message.split(",")[1]));
+                });
+
+                //Rotate the meshes
+                socket.on('model::GYRO_STREAM', function(message){
+
+                    console.log('Message:'+message);
+
+                    var _obj = message.split(",");
+
+                    _obj[0] = (parseFloat(_obj[0])/180)*Math.PI; // 0-360
+                    _obj[1] = (parseFloat(_obj[1])/180)*Math.PI; // -180 - 180
+                    _obj[2] = (parseFloat(_obj[2])/180)*Math.PI; // -90 - 90
+
+                    console.log('\nX:'+parseInt(_obj[0]));
+                    console.log('\nY:'+parseInt(_obj[1]));
+                    console.log('\nZ:'+parseInt(_obj[2]));
+
+                    var quaternion = new THREE.Quaternion();
+                    quaternion.setFromAxisAngle(new THREE.Vector3(_obj[0], _obj[1], _obj[2]), 'XYZ');
+
+                    object3D.rotation.x = _obj[0];
+                    object3D.rotation.y = _obj[1];
+                    object3D.rotation.z = _obj[2];
+
+                    renderer.render( scene, camera );
+
+                });
+
+        });
+
+
+    </script>
+
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <center>
+  <div id="animatedbox">
+  </div>
+  </center>
+
+
+
+</body>
+</html>

@@ -2,12 +2,25 @@
 <html>
 <head>
     <title>Receiver App</title>
-    <script type="text/javascript" src="/static/common/js/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="/static/common/js/socket.io.min.js"></script>
     <script type="text/javascript" src="/static/common/js/shake.js"></script>
-    <link rel="stylesheet" href="/static/common/css/jquery.mobile-1.4.5.min.css">
-    <script src="/static/common/js/jquery-1.11.3.min.js"></script>
-    <script src="/static/common/js/jquery.mobile-1.4.5.min.js"></script>
+    <!--<link rel="stylesheet" href="/static/common/css/jquery.mobile-1.4.5.min.css">-->
+    <!-- Latest compiled and minified JavaScript -->
+<script
+    src="/static/common/js/jquery-3.2.1.min.js"></script>
+
+    <link rel="stylesheet"
+    href="/static/common/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet"
+    href="/static/common/css/bootstrap-theme.min.css">
+
+<script
+  src="/static/common/js/tether.min.js"></script>
+
+<script
+    src="/static/common/js/bootstrap.js"></script>
 
 
     <script type="text/javascript" charset="utf-8">
@@ -36,9 +49,11 @@
             }
 
             window.ondevicemotion = function(event) {
+
                 var accelerationX = event.accelerationIncludingGravity.x;
                 var accelerationY = event.accelerationIncludingGravity.y;
                 var accelerationZ = event.accelerationIncludingGravity.z;
+
 
 
                 if(window.socketConnected){
@@ -81,11 +96,22 @@
         <h1>Air 3D</h1>
       </div>
 
-      <div data-role="main" class="ui-content">
+
+      <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#controls">Controls</a></li>
+            <li><a data-toggle="tab" href="#airmouse">Air Mouse</a></li>
+      </ul>
+
+      <!--Controls Div-->
+      <div class="tab-content">
+      <div id="controls" class="tab-pane fade in active">
+      <h3>Controls</h3>
+        <div data-role="main" class="ui-content">
         <form method="post" action="demoform.asp">
           <label for="points">Zoom:</label>
           <input id='zoomLevel' type="range" name="points" id="points" value="0" min="0" max="100" data-popup-enabled="true">
         </form>
+
         <br/><br/><br/>
         <br/><br/><br/>
         <br/><br/><br/>
@@ -94,13 +120,29 @@
         <br/><br/><br/>
         <br/><br/><br/>
         <br/><br/><br/>
-    <a id="clearModel" href="#" class="ui-btn ui-btn-inline ui-btn-b">Clear Model</a>
-    <br/><br/><br/>
-    <a id="resetModel" href="#" class="ui-btn ui-btn-inline ui-btn-b">Reset Model</a>
-      </div>
-    <br/><br/><br/>
-    <div id="messages">
+
+        <a id="clearModel" href="#" class="ui-btn ui-btn-inline ui-btn-b">Clear Model</a>
+        <br/><br/><br/>
+        <a id="resetModel" href="#" class="ui-btn ui-btn-inline ui-btn-b">Reset Model</a>
+        </div>
+        <br/><br/><br/>
+        <div id="messages">
+        </div>
+        </div>
+
+    <div id="airmouse" class="tab-pane fade">
+    <br>
+    <br>
+    <br>
+    <!--<a href="/" onclick="javascript:event.target.port=8000">Click to Access Air Mouse</a>-->
+    <div class="btn-group">
+    <a href="/" onclick="javascript:event.target.port=8000" class="btn btn-blue btn-default">
+        <center><i class="fa fa-cog" aria-hidden="true"></i> Click to Access Air Mouse</a></center>
     </div>
+    </div>
+
+
+
     </div>
 
 </body>

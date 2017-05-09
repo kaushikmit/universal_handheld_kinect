@@ -1,0 +1,111 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+  href="/static/common/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet"
+  href="/static/common/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script
+  src="/static/common/js/jquery-3.2.1.min.js"></script>
+
+<script
+  src="/static/common/js/tether.min.js"></script>
+
+<script
+  src="/static/common/js/bootstrap.js"></script>
+
+<script src="/static/common/js/three.js"></script>
+
+<!-- For rendering -->
+<script src="/static/heart/js/ShaderSkin.js"></script>
+
+<script src="/static/heart/js/shaders/CopyShader.js"></script>
+
+<script src="/static/heart/js/postprocessing/EffectComposer.js"></script>
+<script src="/static/heart/js/postprocessing/RenderPass.js"></script>
+<script src="/static/heart/js/postprocessing/ShaderPass.js"></script>
+<script src="/static/heart/js/postprocessing/MaskPass.js"></script>
+
+<!-- for DOM events -->
+<script type='text/javascript' src="/static/heart/js/threex.domevent.js"></script>
+<script type='text/javascript' src="/static/heart/js/threex.domevent.object3d.js"></script>
+
+<!-- Other Controls and Events -->
+<script type='text/javascript' src="/static/heart/js/controls/TrackballControls.js"></script>
+<script type='text/javascript' src="/static/heart/js/AnaglyphEffect.js"></script>
+<script type='text/javascript' src="/static/heart/js/Detector.js"></script>
+<script type='text/javascript' src="/static/heart/js/THREEx.FullScreen.js"></script>
+<script type='text/javascript' src="/static/heart/js/THREEx.WindowResize.js"></script>
+
+<script type="text/javascript" src="/static/common/js/socket.io.min.js"></script>
+
+<title>Air3D</title>
+
+
+
+</head>
+
+  <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#">UHK</a>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/objrenderer">OBJ Renderer</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/app/3drenderer">3D Renderer</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/slideshow">Slideshow Presenter</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/airmouse">Air Mouse</a>
+          </li>
+
+        </ul>
+      </div>
+    </nav>
+<center>
+
+</center>
+ <div class="jumbotron">
+        <div class="col-sm-8 mx-auto">
+          <h1>Air3D Renderer</h1>
+
+          <iframe src="/app/heartrenderer" width="1000px" height="1000px"></iframe>
+
+
+        </input>
+
+
+        </div>
+
+    </body>
+
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <center>
+  <div id="animatedbox">
+  </div>
+  </center>
+
+
+
+</body>
+</html>

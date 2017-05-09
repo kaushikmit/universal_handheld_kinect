@@ -3,9 +3,11 @@ monkey.patch_all()
 
 import time
 from threading import Thread
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, redirect
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room, \
     close_room, disconnect
+
+from flask_bootstrap import Bootstrap
 
 import redis
 
@@ -15,6 +17,7 @@ p = redis.ConnectionPool()
 app = Flask(__name__, static_folder='static')
 app.debug = True
 app.config['SECRET_KEY'] = 'secret!'
+Bootstrap(app)
 socketio = SocketIO(app)
 thread = None
 
@@ -60,7 +63,21 @@ def heartrenderer():
 def app_presenter():
     return render_template('app/'+"presentation.html")
 
+@app.route('/app/objrenderer')
+def objrenderer():
+    return render_template('app/' + "objrenderer.html")
 
+@app.route('/app/3drenderer')
+def renderer3d():
+    return render_template('app/' + "3drenderer.html")
+
+@app.route('/app/slideshow')
+def slideshow():
+    return render_template("app/" + "slideshow.html")
+
+@app.route('/app/airmouse')
+def airmouse():
+    return render_template("app/" + "airmouse.html")
 
 """
     Socket.io stream receiver
@@ -93,3 +110,4 @@ def heart_commands_receiver(message):
 
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0")
+
